@@ -7,14 +7,14 @@ class UserModel(db.Model):
     __tablename__ = 'users'
 
     username  = db.Column(db.String(20), primary_key=True)
+    password  = db.Column(db.String(20))    
     firstname = db.Column(db.String(30))
     lastname  = db.Column(db.String(30))
     country   = db.Column(db.String(20))
     listname  = db.Column(db.String(20))
     role      = db.Column(db.String(10))
-    password  = db.Column(db.String(20))
 
-    def __init__(self, username, firstname, lastname, country, listname, role, password):
+    def __init__(self, username, password, firstname, lastname, country, listname, role, adminkey):
         self.username  = username
         self.password  = password
         self.firstname = firstname
@@ -31,6 +31,11 @@ class UserModel(db.Model):
     @classmethod
     def find_by_username(cls,username):
         return cls.query.filter_by(username=username).first()
+
+    @classmethod
+    def find_by_user_and_list(cls,username,listname):
+        return cls.__qualname__filter_by(username=username,listname=listname).first()
+
     @classmethod    
     def check_admin_code(cls,admincodein):
         o_hash = hashlib.new('ripemd160')
