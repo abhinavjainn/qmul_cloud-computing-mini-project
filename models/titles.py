@@ -1,9 +1,10 @@
 from db import db
+from models.users import UserModel
 
 class TitlesModel(db.Model):
     __tablename__ = 'titles'
 
-    listname = db.Column(db.String(20), primary_key=True, db.ForeignKey(users.listname))
+    listname = db.Column(db.String(20), db.ForeignKey(UserModel.listname, primary_key=True))
     title = db.Column(db.String(50), primary_key=True)
     remarks = db.Column(db.String(80))
 
@@ -16,7 +17,7 @@ class TitlesModel(db.Model):
         return {'title': self.title}
 
     @classmethod
-    def find_by_listname(cls, name):
+    def find_by_listname(cls,listname):
         return cls.query.filter_by(listname=listname).first()
 
     def save_to_db(self):
