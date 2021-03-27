@@ -2,11 +2,23 @@
 from flask_restful import Resource, reqparse
 from flask_jwt import jwt_required
 from models.titles import TitlesModel
-#
+# user, session id, title, remarks
 
 
 class Title(Resource):
     parser = reqparse.RequestParser()
+
+    parser.add_argument('username',
+                        type=String,
+                        required=True,
+                        help="This field cannot be left blank!"
+                        )
+
+    parser.add_argument('sid',
+                        type=Str,
+                        required=True,
+                        help="This field cannot be left blank!"
+                        )
     parser.add_argument('title',
                         type=str,
                         required=True,
@@ -18,48 +30,60 @@ class Title(Resource):
                         help="Please give remarks."
                         )
 
-    @jwt_required()
+    # @jwt_required()
+    # user, session id
     def get(self, listname):
-        titles = TitlesModel.find_by_name(listname)
-        if title:
-            return titles.json()
-        return {'message': 'Title not found'}, 404
-
-    def post(self, listname):
-        if TitlesModel.find_by_name(listname):
-            return {'message': "An title with listname '{}' already exists.".format(listname)}, 400
-
         data = Title.parser.parse_args()
+        item = TitlesModel.find_by_listname(listname)
+        if len(item) == 0:
+            return {"error": 'Title name not found'}, 404
+        else:
+            if SessionModel.find_by_sid(data['sid']) and UserModel.find_by_username(data['username']):
+                return item  # .jason()
 
-        titles = TitlesModel(listname, **data)
+    # replace multiple time not allowed!
+    def post(self, listname):
+        data = Title.parser.parse_args()
+        item = TitlesModel.find_by_listname(listname)
+
+        if TitlesModel.find_by_listname(item):
+            return {'message': "A title with listname '{}' already exists.".format(item)}, 400
+
+        item = TitlesModel(listname, **data)
 
         try:
-            titles.save_to_db()
+            item.save_to_db()
         except:
             return {"message": "An error occurred inserting the title."}, 500
 
-        return titles.json(), 201
+        return item.json(), 201
+    # delete item from list: user, session id, title
 
     def delete(self, litsname):
-        titles = TitlesModel.find_by_name(listname)
+        item = TitlesModel.find_by_name(listname)
+
         if titles:
             item.delete_from_db()
 
         return {'message': 'Title deleted'}
 
+    # add item to list: user, session id, title
+    # replace multiple time no problem! hence idempotent
     def put(self, listname):
         data = Title.parser.parse_args()
+        item = TitlesModel.find_by_name(listname)
+        #sess = SessionModel.find_by_sid()
 
-        titles = TitlesModel.find_by_name(listname)
-
-        if titles is None:
-            titles = TitlesModel(listname, **data)
+        if item is None:
+            item = TitlesModel(listname, **data)
         else:
-            titles.title = data['title']
+            item.listname = data['listname']
+            item.remarks = data['remarks']
+            item.title = data['title']
 
-        titles.save_to_db()
+        item.save_to_db()
 
-        return titles.json()
+        return item.json()
 
 
 class TitlesList(Resource):
