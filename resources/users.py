@@ -58,6 +58,8 @@ class UserRegister(Resource):
 
     #   Check if correct admin key is supplied for admin role 
         if data["role"] == "admin":
+            if data["adminkey"] == None:
+                return{"Message" : "No admin code supplied for the admin"}, 401
             if UserModel.check_admin_code(data["adminkey"]) == False:
                 return{"Message" : "Invalid admin code"}, 401
 
