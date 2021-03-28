@@ -6,7 +6,8 @@ from models.sessions import SessionModel
 from models.users import UserModel
 from flask import jsonify
 import json
-import requests, requests_cache
+import requests
+import requests_cache
 # user, session id, title, remarks
 
 
@@ -14,14 +15,15 @@ class Browse(Resource):
 
     def get(self, title):
         url_template = "http://api.tvmaze.com/search/shows?q={title}"
-        url = url_template.format(title = title)
+        url = url_template.format(title=title)
         resp = requests.get(url)
         if resp.ok:
             if resp.text == "[]":
                 return {"message": "Title not found, please check the spellings and separators carefully."}, 404
             return jsonify(resp.json())
         else:
-            return {"message": "Title not found"}, 404      
+            return {"message": "Title not found"}, 404
+
 
 class CreateList(Resource):
     parser = reqparse.RequestParser()
@@ -36,7 +38,7 @@ class CreateList(Resource):
                         type=str,
                         required=True,
                         help="This field cannot be left blank!"
-                        )    
+                        )
 
     parser.add_argument('listname',
                         type=str,
@@ -53,20 +55,107 @@ class CreateList(Resource):
                         type=str,
                         required=False,
                         help="This field cannot be left blank!"
-                        )                        
+                        )
+
     def post(self):
-        data = CreateList.parser.parse_args()     
+        data = CreateList.parser.parse_args()
 #       Check if user session is valid
-            # TBD####
+        # TBD####
 #       Check if user already has a list, if yes => error
-        if UserModel.find_by_user_and_list(data['username'],data["listname"]):
-            return {"message": "A listname already exists for the user"}, 400    
+        if UserModel.find_by_user_and_list(data['username'], data["listname"]):
+            return {"message": "A listname already exists for the user"}, 400
 
         # Save data to DB
-        titles = TitlesModel(data["listname"],data["title"],data["remarks"])
+        titles = TitlesModel(data["listname"], data["title"], data["remarks"])
         titles.save_to_db()
 
 
+class AddList(Resource):
+    parser = reqparse.RequestParser()
+
+    parser.add_argument('username',
+                        type=str,
+                        required=True,
+                        help="This field cannot be left blank!"
+                        )
+
+    parser.add_argument('sid',
+                        type=str,
+                        required=True,
+                        help="This field cannot be left blank!"
+                        )
+
+    parser.add_argument('listname',
+                        type=str,
+                        required=True,
+                        help="This field cannot be left blank!"
+                        )
+
+    parser.add_argument('title',
+                        type=str,
+                        required=True,
+                        help="This field cannot be left blank!"
+                        )
+    parser.add_argument('remarks',
+                        type=str,
+                        required=False,
+                        help="This field cannot be left blank!"
+                        )
+
+    def put(self):
+        data = AddtoList.parser.parse_args()
+#       Check if user session is valid
+#       Check if user already has a list, if yes => error
+        if UserModel.find_by_user_and_list(data['username'], data["listname"]):
+            return {"message": "A listname already exists for the user"}, 400
+        # check if list name exists, if not create one with required parameters
+
+        item = TitlesModel.find_by_listname(data['listname'])
+        if item is None:
+            item = TitlesModel(data["listname"], data["title"], data["remarks"])
+
+        item.save_to_db()
+
+
+class DeleteList(Resource):
+    parser = reqparse.RequestParser()
+
+    parser.add_argument('username',
+                        type=str,
+                        required=True,
+                        help="This field cannot be left blank!"
+                        )
+
+    parser.add_argument('listname',
+                        type=str,
+                        required=True,
+                        help="This field cannot be left blank!"
+                        )
+
+    parser.add_argument('title',
+                        type=str,
+                        required=True,
+                        help="This field cannot be left blank!"
+                        )
+    parser.add_argument('remarks',
+                        type=str,
+                        required=False,
+                        help="This field cannot be left blank!"
+                        )
+
+    def delete(self):
+        data = DeliteList.parser.parse_args()
+        # Check if user session is valid
+        item_to_delete = []
+        item_to_delete.append(UserModel.find_by_user_and_list(data['username'], data["listname"]))
+        item_to_delete.append(data['title'])
+        if len(item_to_delete) == 0:
+            return {'message': 'username and listname dont exist'}, 400
+        else:
+            item_to_delete.delete_from_db()
+            # TitlesModel(data['title']).delete_from_db()
+
+        return {'message': 'Title deleted'}
 
 # class Title(Resource):
 #     parser = reqparse.RequestParser()
