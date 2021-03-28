@@ -1,6 +1,7 @@
 import hashlib
 import uuid
 
+# Login user
 class Login(Resource):
     parser = reqparse.RequestParser(bundle_errors=True)
     parser.add_argument('username',
@@ -28,13 +29,40 @@ class Login(Resource):
         elif hashed_pswd.hexdigest() != user.password:
             return{"message" : "Username or Password is incorrect"}
         else:
-            session_id = str(uuid.uuid4())
-            return {"message" : "User successfully logged in and the Session id :{}".format(session_id)}
-       
-       # Save Session_id to DB
-        session_id = SessionModel(data["username"],data["sid"],data["status"])
-        print("Status : Active Session ID")
-        session_id.save_to_db()
+            session_id = uuid.uuid4()
+            data['sid']=session_id
+        
+        # Save Session_id to DB
+            session = SessionModel(**data)
+            session.save_to_db()
+            
+            return {"message" : "User successfully logged in and the Session id :{}".format(session_id)}, 201
+
+
+# Logout User
+class Logout(Resource):
+    parser = reqparse.RequestParser(bundle_errors=True)
+    parser.add_argument('username',
+        type=str,
+        required=True,
+        help="Username cannot be blank."
+    )
+    parser.add_argument('session_id',
+        type=str,
+        required=True,
+        help="Session_id cannot be blank."
+    )  
+
+    def delete_user(self):
+        data = Logout.parser.parse_args()
+        user = SessionModel.query.filter_by(sid=data['session_id'], status='Active', username=data['username'] ).first()
+        if not user:
+            return {'message' : 'No active session found'}, 404
+        else:
+            db.session.delete(session_id)
+            db.session.commit()
+            return {'message' : 'User logged out!'}, 200
+
         
 
     
