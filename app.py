@@ -4,8 +4,8 @@ from flask import Flask
 from flask_restful import Api
 
 from resources.users import UserRegister
-from resources.titles import Browse
-# from resources.sessions import 
+from resources.titles import Browse, CreateList, AddToList, DeleteFromList
+from resources.sessions import Login, Logout
 
 app = Flask(__name__)
 
@@ -18,6 +18,11 @@ api = Api(app)
 
 api.add_resource(UserRegister, '/register')
 api.add_resource(Browse, '/browse/<title>')
+api.add_resource(Login, 'login')
+api.add_resource(Logout, 'logout')
+api.add_resource(CreateList, '/create-list')
+api.add_resource(AddToList, '/add-to-list')
+api.add_resource(DeleteFromList, '/delete-from-list')
 
 if __name__ == '__main__':
     from db import db
