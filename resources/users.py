@@ -58,8 +58,8 @@ class UserRegister(Resource):
 
     #   Check if correct admin key is supplied for admin role 
         if data["role"] == "admin":
-            if UserModel.check_admin_code(data["admincode"]) == False:
-                return{"Invalid admin code"}, 401
+            if UserModel.check_admin_code(data["adminkey"]) == False:
+                return{"Message" : "Invalid admin code"}, 401
 
 #       Hash password before saving to DB    
         o_hash = hashlib.new('ripemd160')
