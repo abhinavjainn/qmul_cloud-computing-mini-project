@@ -17,9 +17,11 @@ class Browse(Resource):
         url = url_template.format(title = title)
         resp = requests.get(url)
         if resp.ok:
+            if resp.text == "[]":
+                return {"message": "Title not found, please check the spellings and separators carefully."}, 404
             return jsonify(resp.json())
         else:
-            return {"message": "Tile not found"}, 404      
+            return {"message": "Title not found"}, 404      
 
 class CreateList(Resource):
     parser = reqparse.RequestParser()
