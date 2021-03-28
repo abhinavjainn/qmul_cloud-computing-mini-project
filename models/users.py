@@ -2,6 +2,7 @@
 from db import db
 from models.admin import AdminModel
 import hashlib
+from werkzeug.security import safe_str_cmp
 
 class UserModel(db.Model):
     __tablename__ = 'users'
@@ -40,7 +41,7 @@ class UserModel(db.Model):
     def check_admin_code(cls,admincodein):
         o_hash = hashlib.new('ripemd160')
         o_hash.update(admincodein.encode("utf-8"))
-        if o_hash.hexdigest() == AdminModel.get_id():
+        if safe_str_cmp(AdminModel.get_id(), o_hash.hexdigest()) == True:    
             return True
         else:
             return False       
