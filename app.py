@@ -26,7 +26,9 @@ if __name__ == '__main__':
     if app.config['DEBUG']:
         @app.before_first_request
         def create_tables():
+            from models.admin import AdminModel
             db.create_all()
+            AdminModel().save_to_db()
 
     app.run(host='0.0.0.0')
     # app.run(port=5000)
