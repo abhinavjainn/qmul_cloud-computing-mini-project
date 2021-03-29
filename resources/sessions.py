@@ -3,10 +3,7 @@ import uuid
 import sqlite3
 from flask_restful import Resource, reqparse
 from models.users import UserModel
-<<<<<<< HEAD
 from models.sessions import SessionModel
-=======
->>>>>>> 9f6bf82821d472c78d89b69aeac25f2353e65554
 
 # Login user
 class Login(Resource):
@@ -23,27 +20,26 @@ class Login(Resource):
                         )
 
     # Authenticate User
-    def post(self, username, password):
+    def post(self):
+        print("post triggered")
         data = Login.parser.parse_args()
 
         # Hashed Password
-        hash = hashlib.new('ripemd160')
-        hashed_pswd = hash.update(data['password'].encode("utf-8"))
+        o_hash = hashlib.new('ripemd160')
+        o_hash.update(data['password'].encode("utf-8"))
 
-        user = UserModel.find_by_username(username=username)
+        user = UserModel.find_by_username(username=data['username'])
         if user is None:
-            return {"message": "Username or Password is incorrect"}
-        elif hashed_pswd.hexdigest() != user.password:
-            return{"message": "Username or Password is incorrect"}
+            return {"message": "Username or Password is incorrect"}, 401
+        elif o_hash.hexdigest() != user.password:
+            return{"message": "Username or Password is incorrect"}, 401
         else:
-            session_id = uuid.uuid4()
-            data['sid'] = session_id
-
-        # Save Session_id to DB
-            session = SessionModel(**data)
+            session_id = str(uuid.uuid4())
+        #   Save Session_id to DB
+            session = SessionModel(username=data['username'],sid=session_id,status="Active")
             session.save_to_db()
             return {"message" : "User successfully logged in.",
-                    "Session id" : session_id}, 201
+                    "sid" : session_id}, 201
 
 # Logout User
 class Logout(Resource):
@@ -53,19 +49,18 @@ class Logout(Resource):
                         required=True,
                         help="Username cannot be blank."
                         )
-    parser.add_argument('session_id',
+    parser.add_argument('sid',
                         type=str,
                         required=True,
-                        help="Session_id cannot be blank."
+                        help="sid cannot be blank."
                         )
 
-    def delete_user(self):
+    def delete(self):
         data = Logout.parser.parse_args()
         session = SessionModel.find_by_user_sid_status(
-            sid=data['session_id'], status='Active', username=data['username'])
+            sid=data['sid'], status='Active', username=data['username'])
         if session == None:
             return {'message': 'No active session found'}, 404
         else:
-            session.delete_from_db(**data)
-            session.commit()
+            session.delete_from_db()
             return {'message': 'User logged out!'}, 200

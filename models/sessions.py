@@ -6,7 +6,7 @@ from models.users import UserModel
 class SessionModel(db.Model):
     __tablename__ = 'sessions'
 
-    username  = db.Column(db.String(20),db.ForeignKey(UserModel.username,primary_key=True))
+    username  = db.Column(db.String(20),db.ForeignKey(UserModel.username),primary_key=True)
     sid = db.Column(db.String(36), primary_key=True)
     status = db.Column(db.String(10))
 

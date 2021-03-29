@@ -1,6 +1,7 @@
 import sqlite3
 from flask_restful import Resource, reqparse
 from models.users import UserModel
+from models.titles import TitlesModel
 import hashlib
 
 class UserRegister(Resource):
@@ -56,6 +57,10 @@ class UserRegister(Resource):
         if UserModel.find_by_username(data['username']):
             return {"message": "A user with the given username already exists"}, 400
 
+        # Check if list name is already present
+        if TitlesModel.find_by_listname(listname=data['listname']):
+            return{"message" : "A list already exists with this name, please selecta different list name."}, 403
+            
     #   Check if correct admin key is supplied for admin role 
         if data["role"] == "admin":
             if data["adminkey"] == None:
