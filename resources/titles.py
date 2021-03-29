@@ -59,9 +59,12 @@ class CreateList(Resource):
 
     def post(self):
         data = CreateList.parser.parse_args()
-        # Check if user session is valid
-        # TBD####
-        # Check if user already has a list, if yes => error
+
+        # Check if user session is valid, if user doesn't have a valid active session => Error
+        if SessionModel.find_by_user_sid_status(
+                username=data['username'],sid=data['sid'],status='Active') == None:
+            return {'message': 'Invalid session ID'}, 404
+
         if UserModel.find_by_user_and_list(data['username'], data["listname"]):
             return {"message": "A listname already exists for the user"}, 400
 
@@ -103,22 +106,19 @@ class AddToList(Resource):
                         )
 
     def put(self):
-        data = AddtoList.parser.parse_args()
-        # check if list name exists, if not create one with required parameters
-        item = TitlesModel.find_by_listname(data['listname'])
-        # Check if user session is valid
-        session_id_valid = SessionModel(data['sid'])
-        # if user doesn't have a valid active sessions
-        if session_id_valid is None:
-            return {'message': 'Inter a valid session ID'}, 404
+        data = AddToList.parser.parse_args()
+        # Check if user session is valid, if user doesn't have a valid active session => Error
+        if SessionModel.find_by_user_sid_status(
+                username=data['username'],sid=data['sid'],status='Active') == None:
+            return {'message': 'Invalid session ID'}, 404
+
+#       Add new title to list if title doesn't exit, if exists then return error    
+        if TitlesModel.find_by_listname_title(listname=data['listname'], title=data['title']) == None:
+            item = TitlesModel(listname = data["listname"], title = data["title"], remarks = data["remarks"])
+            item.save_to_db()
+            return {'message': 'Resource updated successfully'}, 204
         else:
-            # Check if user already has a list, if yes => error
-            if UserModel.find_by_user_and_list(data['username'], data["listname"]):
-                return {"message": "A listname already exists for the user"}, 404
-            if item is None:
-                item = TitlesModel(data["listname"], data["title"], data["remarks"])
-                return {'message': 'Resource updated successfully'}, 204
-                item.save_to_db()
+            return {"message" : "Title already exists" }, 400    
 
 
 class DeleteFromList(Resource):
@@ -146,22 +146,22 @@ class DeleteFromList(Resource):
                         help="This field cannot be left blank!"
                         )
 
-    def delete_from_list(self):
-        data = DeliteList.parser.parse_args()
-        # title to delete
-        list_to_delete = TitlesModel.find_by_listname_and_title(data['username'], data["title"])
-        # Check if user session is valid
-        valid_session_id = SessionModel(data['sid'])
-        # if user doesn't have a valid active sessions, error
-        if valid_session_id is None:
-            return {'message': 'No active sessions found'}, 404
-        else:
-            if TitlesModel(data['title']) not in list_to_delete:  # len(list_to_delete) == 0:
-                return {'message': 'The requested title doesnt exist in the list'}, 400
-            else:
-                TitlesModel(data['title']).delete_from_db()
-                # TitlesModel(data['title']).delete_from_db()
-                return {'message': 'List has been deleted from the database'}, 200
+    def delete(self):
+        data = DeleteFromList.parser.parse_args()
+
+        # Check if user session is valid, if user doesn't have a valid active session => Error
+        if SessionModel.find_by_user_sid_status(
+                username=data['username'],sid=data['sid'],status='Active') == None:
+            return {'message': 'Invalid session ID'}, 404
+
+        # Check if title to be deleted exists, if not then return error
+        if TitlesModel.find_by_listname_title(listname=data['listname'],title=data['title']) == None:
+            return {'message': 'The requested title doesnt exist in the list'}, 400
+
+        # Title found, Delete title from list
+        title = TitlesModel(listname = data['listname'], title= data['title'])
+        title.delete_from_db()
+        return {'message': 'Title has been deleted from the list'}, 200
 
 
 class DeleteList(Resource):
@@ -184,25 +184,27 @@ class DeleteList(Resource):
                         )
 
     def delete_list(self):
-        data = DeliteList.parser.parse_args()
-        # list to delete
-        list_to_delete = UserModel.find_by_username(data['listname'])
-        # Check if user session is valid
-        valid_session_id = SessionModel(data['sid'])
-        # if user doesn't have a valid active sessions, error
-        if session_id_valid is None:
-            return {'message': 'No active sessions found'}, 404
-        else:
-            if len(list_to_delete) == 0:
-                return {'message': 'The request item doesnt exist in the database'}, 400
-            else:
-                # delete title from user
-                List = UserModel(data['listname'])
-                List.delete_from_db()
-                # TitlesModel(data['title']).delete_from_db()
-                return {'message': 'List has been deleted successfully'}, 200
+        data = DeleteList.parser.parse_args()
 
+        # Check if user session is valid, if user doesn't have a valid active session => Error
+        if SessionModel.find_by_user_sid_status(
+                username=data['username'],sid=data['sid'],status='Active') == None:
+            return {'message': 'Invalid session ID'}, 404
 
+        # Check if list to be deleted exists, if not then return an error message
+        if UserModel.find_by_user_and_list(
+            username=data['username'],listname=data['listname']) == None:
+            return {'message': 'The list to be deleted does not exist for the user'}, 400
+
+        # Delete the list
+        title = TitlesModel(listname = data['listname'], title=data['title'])    
+        title.delete_from_db()
+       # Update user table by removing the list reference
+        user = UserModel.find_by_username(data['username'])
+        user.listname = ""
+        user.update_db()          
+        return {'message': 'List has been deleted successfully'}, 200
+   
 class TitlesList(Resource):
     def get(self):
         return {'titles': [x.json() for x in TitlesModel.query.all()]}
