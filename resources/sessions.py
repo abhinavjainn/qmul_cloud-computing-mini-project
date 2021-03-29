@@ -1,7 +1,7 @@
 import hashlib
 import uuid
 from flask_restful import Resource, reqparse
-from model.user import Username
+from models.users import Username
 
 # Login user
 
