@@ -1,11 +1,11 @@
 import hashlib
 import uuid
+import sqlite3
 from flask_restful import Resource, reqparse
-from model.user import Username
+from models.users import UserModel
+from models.sessions import SessionModel
 
 # Login user
-
-
 class Login(Resource):
     parser = reqparse.RequestParser(bundle_errors=True)
     parser.add_argument('username',
@@ -20,14 +20,14 @@ class Login(Resource):
                         )
 
     # Authenticate User
-    def post(username, password):
+    def post(self, username, password):
         data = Login.parser.parse_args()
 
         # Hashed Password
         hash = hashlib.new('ripemd160')
         hashed_pswd = hash.update(data['password'].encode("utf-8"))
 
-        user = UserModel.query.filter_by(username=username).first()
+        user = UserModel.find_by_username(username=username)
         if user is None:
             return {"message": "Username or Password is incorrect"}
         elif hashed_pswd.hexdigest() != user.password:
@@ -39,9 +39,8 @@ class Login(Resource):
         # Save Session_id to DB
             session = SessionModel(**data)
             session.save_to_db()
-
-            return {"message": "User successfully logged in and the Session id :{}".format(session_id)}, 201
-
+            return {"message" : "User successfully logged in.",
+                    "Session id" : session_id}, 201
 
 # Logout User
 class Logout(Resource):
@@ -59,11 +58,11 @@ class Logout(Resource):
 
     def delete_user(self):
         data = Logout.parser.parse_args()
-        user = SessionModel.query.filter_by(
-            sid=data['session_id'], status='Active', username=data['username']).first()
-        if not user:
+        session = SessionModel.find_by_user_sid_status(
+            sid=data['session_id'], status='Active', username=data['username'])
+        if session == None:
             return {'message': 'No active session found'}, 404
         else:
-            db.session.delete(session_id)
-            db.session.commit()
+            session.delete_from_db(**data)
+            session.commit()
             return {'message': 'User logged out!'}, 200
