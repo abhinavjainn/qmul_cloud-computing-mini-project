@@ -9,7 +9,7 @@ from resources.sessions import Login, Logout
 
 app = Flask(__name__)
 
-# app.config['DEBUG'] = True
+#app.config['DEBUG'] = True
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///data.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -18,8 +18,8 @@ api = Api(app)
 
 api.add_resource(UserRegister, '/register')
 api.add_resource(Browse, '/browse/<title>')
-api.add_resource(Login, 'login')
-api.add_resource(Logout, 'logout')
+api.add_resource(Login, '/login')
+api.add_resource(Logout, '/logout')
 api.add_resource(CreateList, '/create-list')
 api.add_resource(AddToList, '/add-to-list')
 api.add_resource(DeleteFromList, '/delete-from-list')
