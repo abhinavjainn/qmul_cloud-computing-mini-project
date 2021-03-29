@@ -1,5 +1,6 @@
 import hashlib
 import uuid
+from flask_restful import Resource, reqparse
 
 # Login user
 class Login(Resource):
