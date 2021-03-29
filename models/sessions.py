@@ -23,6 +23,18 @@ class SessionModel(db.Model):
         db.session.add(self)
         db.session.commit()
 
+    def delete_from_db(self):
+        db.session.delete(self)
+        db.session.commit()
+
     @classmethod
     def find_by_sid(cls, sid):
         return cls.query.filter_by(sid=sid).first()
+
+    @classmethod
+    def find_by_user_sid(cls, username, sid):
+        return cls.query.filter_by(username=username,sid=sid).first()
+
+    @classmethod
+    def find_by_user_sid_status(cls, username, sid, status):
+        return cls.query.filter_by(username = username, sid = sid, status = status).first()        
