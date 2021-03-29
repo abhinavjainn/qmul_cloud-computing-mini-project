@@ -3,7 +3,10 @@ import uuid
 import sqlite3
 from flask_restful import Resource, reqparse
 from models.users import UserModel
+<<<<<<< HEAD
 from models.sessions import SessionModel
+=======
+>>>>>>> 9f6bf82821d472c78d89b69aeac25f2353e65554
 
 # Login user
 class Login(Resource):
