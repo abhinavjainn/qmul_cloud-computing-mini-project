@@ -4,7 +4,7 @@ from models.users import UserModel
 class TitlesModel(db.Model):
     __tablename__ = 'titles'
 
-    listname = db.Column(db.String(20), db.ForeignKey(UserModel.listname, primary_key=True))
+    listname = db.Column(db.String(20), db.ForeignKey(UserModel.listname), primary_key=True)
     title = db.Column(db.String(50), primary_key=True)
     remarks = db.Column(db.String(80))
 
@@ -19,6 +19,10 @@ class TitlesModel(db.Model):
     @classmethod
     def find_by_listname(cls,listname):
         return cls.query.filter_by(listname=listname).first()
+
+    @classmethod
+    def find_by_listname_all(cls,listname):
+        return cls.query.filter_by(listname=listname).all()        
 
     @classmethod
     def find_by_listname_title(cls,listname, title):
