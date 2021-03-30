@@ -7,4 +7,5 @@ db.init_app(app)
 def create_tables():
     from models.admin import AdminModel
     db.create_all()
-    AdminModel().save_to_db()
+    if AdminModel.get_id() == None:
+        AdminModel().save_to_db()
