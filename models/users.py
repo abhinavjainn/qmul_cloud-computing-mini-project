@@ -8,7 +8,7 @@ class UserModel(db.Model):
     __tablename__ = 'users'
 
     username  = db.Column(db.String(20), primary_key=True)
-    password  = db.Column(db.String(20))    
+    password  = db.Column(db.String(40))    
     firstname = db.Column(db.String(30))
     lastname  = db.Column(db.String(30))
     country   = db.Column(db.String(20))
