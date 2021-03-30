@@ -1,5 +1,4 @@
 
-import sqlite3
 from db import db
 
 class AdminModel(db.Model):
