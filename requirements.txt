@@ -5,3 +5,5 @@ Flask-SQLAlchemy
 pip
 uwsgi
 psycopg2
+requests
+requests_cache
