@@ -9,11 +9,12 @@ app = Flask(__name__)
 
 #app.config['DEBUG'] = True   # required for local testing to create db, commented for cloud hosting
 
-# Database and app secret key
-db_url = os.environ.get('DATABASE_URL')
-app.config['SQLALCHEMY_DATABASE_URI'] = db_url.replace("://", "ql://", 1)
-# app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///data.db')
-# app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URI', 'sqlite:///data.db')
+# App configuration: Database and app secret key
+db_url = os.environ.get('DATABASE_URL').replace("://", "ql://", 1) 
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(db_url, 'sqlite:///data.db') 
+# db_url = os.environ.get('DATABASE_URL')     
+# app.config['SQLALCHEMY_DATABASE_URI'] = db_url.replace("://", "ql://", 1)  
+# app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///data.db') 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = 'QMUL_CC_T12'
 api = Api(app)
@@ -39,5 +40,4 @@ if __name__ == '__main__':
             AdminModel().save_to_db()
 
     app.run(host='0.0.0.0')
-    # app.run(port=5000)
 

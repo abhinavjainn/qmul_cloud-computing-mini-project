@@ -4,9 +4,11 @@ from models.admin import AdminModel
 import hashlib
 from werkzeug.security import safe_str_cmp
 
+# Database table: users
 class UserModel(db.Model):
     __tablename__ = 'users'
 
+    # Declare table columns
     username  = db.Column(db.String(20), primary_key=True)
     password  = db.Column(db.String(40))    
     firstname = db.Column(db.String(30))
@@ -15,6 +17,7 @@ class UserModel(db.Model):
     listname  = db.Column(db.String(20))
     role      = db.Column(db.String(10))
 
+    # Constructor for table instance
     def __init__(self, username, password, firstname, 
                     lastname, country, listname, role, adminkey):
         self.username  = username
@@ -26,14 +29,17 @@ class UserModel(db.Model):
         self.role      = role
         self.admincode = ""
 
+    # Internal method to save data in table
     def save_to_db(self):
         db.session.add(self)
         db.session.commit()
 
+    # Internal method to update data in table
     def update_db(self):
         db.session.update(self)
         db.session.commit()
 
+    # Static methods - to be used by external methods as interfaces for database queries
     @classmethod
     def find_by_username(cls,username):
         return cls.query.filter_by(username=username).first()
