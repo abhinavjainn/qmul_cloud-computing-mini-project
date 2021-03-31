@@ -11,7 +11,7 @@ app = Flask(__name__)
 
 # App configuration: Database and app secret key
 db_url = os.environ.get('DATABASE_URL').replace("://", "ql://", 1) 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(db_url, 'sqlite:///data.db') 
+app.config['SQLALCHEMY_DATABASE_URI'] = (db_url, 'sqlite:///data.db') 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = 'QMUL_CC_T12'
 api = Api(app)
