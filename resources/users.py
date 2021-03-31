@@ -4,6 +4,7 @@ from models.users import UserModel
 from models.titles import TitlesModel
 import hashlib
 
+# Resource: User Registration / Sign up
 class UserRegister(Resource):
 
 #   Define request attributes for new user signup
