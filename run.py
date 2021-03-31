@@ -7,5 +7,5 @@ db.init_app(app)
 def create_tables():
     from models.admin import AdminModel
     db.create_all()
-    if AdminModel.get_id() == None:  #comment for local execution
-        AdminModel().save_to_db()    #Unindent for local execution
+    # if AdminModel.get_id() == None:  #Required for initial heroku deploymenyt, commented after that
+        # AdminModel().save_to_db()    #Required for initial heroku deploymenyt, commented after that
