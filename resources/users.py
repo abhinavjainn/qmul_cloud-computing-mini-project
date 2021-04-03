@@ -119,11 +119,6 @@ class UserDelete(Resource):
         if UserModel.find_by_username(data['user_to_delete']) == None:
             return {"message": "User to be deleted does not exist"}, 404
 
-
-    #   Delete user data from all database atbles
-        user = UserModel.find_by_username(username=data['user_to_delete'])
-        user.delete_from_db()
-
         # Titles table
         titles = TitlesModel.find_by_listname(listname=user.listname)
         if titles != None:
@@ -133,5 +128,9 @@ class UserDelete(Resource):
         sessions = SessionModel.find_by_user(username=user.username)
         if sessions != None:
             SessionModel.delete_user_all(username=data['user_to_delete'])
+            
+    #   Delete user data from all database atbles
+        user = UserModel.find_by_username(username=data['user_to_delete'])
+        user.delete_from_db()            
 
         return {"message": "User deleted successfully."}, 200
