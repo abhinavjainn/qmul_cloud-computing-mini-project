@@ -122,6 +122,7 @@ class UserDelete(Resource):
         # User instance
         user = UserModel.find_by_username(username=data['user_to_delete'])
         
+#       Delete user data from all database tables        
         # Titles table
         titles = TitlesModel.find_by_listname(listname=user.listname)
         if titles != None:
@@ -132,7 +133,7 @@ class UserDelete(Resource):
         if sessions != None:
             SessionModel.delete_user_all(username=data['user_to_delete'])
             
-    #   Delete user data from all database atbles
+        # User table
         user.delete_from_db()            
 
         return {"message": "User deleted successfully."}, 200
