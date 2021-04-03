@@ -18,8 +18,8 @@ class UserModel(db.Model):
     role      = db.Column(db.String(10))
 
     # Constructor for table instance
-    def __init__(self, username, password, firstname, 
-                    lastname, country, listname, role, adminkey):
+    def __init__(self, username, password=None, firstname=None, 
+                    lastname=None, country=None, listname=None, role=None, adminkey=None):
         self.username  = username
         self.password  = password
         self.firstname = firstname
@@ -39,6 +39,11 @@ class UserModel(db.Model):
         db.session.update(self)
         db.session.commit()
 
+    # Internal method to delete data from table
+    def delete_from_db(self):
+        db.session.delete(self)
+        db.session.commit()    
+
     # Static methods - to be used by external methods as interfaces for database queries
     @classmethod
     def find_by_username(cls,username):
@@ -56,3 +61,7 @@ class UserModel(db.Model):
             return True
         else:
             return False       
+
+    @classmethod
+    def find_by_user_and_role(cls,username,role):
+        return cls.query.filter_by(username=username,role=role).first()

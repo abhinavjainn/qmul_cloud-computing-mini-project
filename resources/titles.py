@@ -163,4 +163,4 @@ class ViewList(Resource):
             return {'message': 'Invalid list name for the user'}, 403    
 
         # Return all titles
-        return {'titles': [x.json() for x in TitlesModel.find_by_listname_all(listname=data['listname'])]}
+        return {'titles': [x.json() for x in TitlesModel.find_by_listname_all(listname=data['listname'])]}, 200

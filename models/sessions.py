@@ -43,3 +43,15 @@ class SessionModel(db.Model):
     @classmethod
     def find_by_user_sid_status(cls, username, sid, status):
         return cls.query.filter_by(username = username, sid = sid, status = status).first()        
+    
+    @classmethod
+    def find_by_user(cls,username):
+        return cls.query.filter_by(username=username).first()
+
+    @classmethod
+    def delete_user_all(cls,username):
+        list_sessions = cls.query.filter_by(username = username).all()
+        for i in list_sessions:
+            # print("deleting: ",i)
+            i.delete_from_db()
+

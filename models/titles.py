@@ -42,3 +42,11 @@ class TitlesModel(db.Model):
     @classmethod
     def find_by_listname_title(cls,listname, title):
         return cls.query.filter_by(listname=listname, title = title).first()        
+
+    @classmethod
+    def delete_titles_all(cls,listname):
+        list_titles = cls.query.filter_by(listname = listname).all()
+        # print("Mehtod in title resource, list values: ",list_titles, "lsitname:", listname)
+        for i in list_titles:
+            # print("Deleting: ", i)
+            i.delete_from_db()
