@@ -19,7 +19,7 @@ The application “World TV Database” has following main features:
 
 # Application URL
 
-https://world-tv-db.herokuapp.com/v
+https://world-tv-db.herokuapp.com/
 
 # Application endpoints
 
