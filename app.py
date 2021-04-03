@@ -1,7 +1,7 @@
 import os
 from flask import Flask
 from flask_restful import Api
-from resources.users import UserRegister
+from resources.users import UserRegister, UserDelete
 from resources.titles import Browse, AddToList, DeleteFromList, ViewList
 from resources.sessions import Login, Logout
 
@@ -24,6 +24,7 @@ api.add_resource(Login, '/login')
 api.add_resource(Logout, '/logout')
 api.add_resource(AddToList, '/add-to-list')
 api.add_resource(DeleteFromList, '/delete-from-list')
+api.add_resource(UserDelete, '/delete-user')
 api.add_resource(ViewList, '/view-list')
 
 if __name__ == '__main__':

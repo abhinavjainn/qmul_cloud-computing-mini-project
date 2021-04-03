@@ -2,6 +2,7 @@ import sqlite3
 from flask_restful import Resource, reqparse
 from models.users import UserModel
 from models.titles import TitlesModel
+from models.sessions import SessionModel
 import hashlib
 
 # Resource: User Registration / Sign up
@@ -56,11 +57,11 @@ class UserRegister(Resource):
 
 #       Check if user name is already present
         if UserModel.find_by_username(data['username']):
-            return {"message": "A user with the given username already exists"}, 400
+            return {"message": "A user with the given username already exists"}, 403
 
         # Check if list name is already present
         if TitlesModel.find_by_listname(listname=data['listname']):
-            return{"message" : "A list already exists with this name, please selecta different list name."}, 403
+            return{"message" : "A list already exists with this name, please select a different list name."}, 403
             
     #   Check if correct admin key is supplied for admin role 
         if data["role"] == "admin":
@@ -79,3 +80,58 @@ class UserRegister(Resource):
         user.save_to_db()
 
         return {"message": "User created successfully."}, 201
+
+# Resource: User Deletion / Sign up
+class UserDelete(Resource):
+
+#   Define request attributes for new user signup
+    parser = reqparse.RequestParser(bundle_errors=True)
+    parser.add_argument('username',
+        type=str,
+        required=True,
+        help="Username cannot be blank."
+    )
+    parser.add_argument('sid',
+                        type=str,
+                        required=True,
+                        help="This field cannot be left blank!"
+                        )
+    parser.add_argument('user_to_delete',
+        type=str,
+        required=True,
+        help="User to be deleted must be specified."
+    )
+
+#   Post method to create new user
+    def delete(self):
+        data = UserDelete.parser.parse_args()
+
+        # Check if user session is valid, if user doesn't have a valid active session => Error
+        if SessionModel.find_by_user_sid_status(
+                username=data['username'],sid=data['sid'],status='Active') == None:
+            return {'message': 'Invalid session ID'}, 403
+
+#       Check if user name is an admin
+        if UserModel.find_by_user_and_role(username=data['username'],role="admin") == None:
+            return {"message": "No authorization to delete users"}, 401
+
+#       Check if user to be deleted is present   
+        if UserModel.find_by_username(data['user_to_delete']) == None:
+            return {"message": "User to be deleted does not exist"}, 404
+
+
+    #   Delete user data from all database atbles
+        user = UserModel.find_by_username(username=data['user_to_delete'])
+        user.delete_from_db()
+
+        # Titles table
+        titles = TitlesModel.find_by_listname(listname=user.listname)
+        if titles != None:
+            TitlesModel.delete_titles_all(listname=titles.listname)
+
+        # Session table
+        sessions = SessionModel.find_by_user(username=user.username)
+        if sessions != None:
+            SessionModel.delete_user_all(username=data['user_to_delete'])
+
+        return {"message": "User deleted successfully."}, 200
