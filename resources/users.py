@@ -118,7 +118,10 @@ class UserDelete(Resource):
 #       Check if user to be deleted is present   
         if UserModel.find_by_username(data['user_to_delete']) == None:
             return {"message": "User to be deleted does not exist"}, 404
-
+        
+        # User instance
+        user = UserModel.find_by_username(username=data['user_to_delete'])
+        
         # Titles table
         titles = TitlesModel.find_by_listname(listname=user.listname)
         if titles != None:
@@ -130,7 +133,6 @@ class UserDelete(Resource):
             SessionModel.delete_user_all(username=data['user_to_delete'])
             
     #   Delete user data from all database atbles
-        user = UserModel.find_by_username(username=data['user_to_delete'])
         user.delete_from_db()            
 
         return {"message": "User deleted successfully."}, 200
