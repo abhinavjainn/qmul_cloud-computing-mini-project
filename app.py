@@ -21,7 +21,8 @@ api = Api(app)
 # Endpoint: Home
 @app.route('/')
 def home_endpoint():
-    text = 'Welcome to World TV Databse. Browse your favrourite TV shows and movies. Sign up and save your watchlist. More features coming up.'
+    text = 'Welcome to World TV Database. \nBrowse your favrourite TV shows and movies. \nSign up and save your watchlist.\
+     \nMore features coming up. \nUse service endpoints to use our services'
     return text, 200
 # Main services endpoints
 api.add_resource(UserRegister, '/register')
