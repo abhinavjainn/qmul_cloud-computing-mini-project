@@ -18,6 +18,12 @@ app.secret_key = 'QMUL_CC_T12'
 api = Api(app)
 
 # Specify End-Points
+# Endpoint: Home
+@app.route('/')
+def home_endpoint():
+    text = 'Welcome to World TV Databse. Browse your favrourite TV shows and movies. Sign up and save your watchlist. More features coming up.'
+    return text, 200
+# Main services endpoints
 api.add_resource(UserRegister, '/register')
 api.add_resource(Browse, '/browse/<title>')
 api.add_resource(Login, '/login')
