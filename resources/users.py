@@ -102,7 +102,7 @@ class UserDelete(Resource):
         help="User to be deleted must be specified."
     )
 
-#   Post method to create new user
+#   Delete method to delete a user and all its data (can be called by admin only)
     def delete(self):
         data = UserDelete.parser.parse_args()
 
