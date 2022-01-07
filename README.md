@@ -1,12 +1,13 @@
 # QMUL_Cloud-Computing-Mini-Project
 
-1. This project aims to build a Flask backend application with RESTful architecture.
-2. The project will create an application to browse TV show titles and save personalized list of TV titles.
-3. The application will follow the REST standard and will be hosted on the Heroku cloud platform.
+1. This project built a Flask backend application with RESTful architecture.
+2. The project created an application to browse TV show titles and save personalized list of TV titles.
+3. The application followed the REST standard and has been hosted on the [Heroku cloud platform](https://world-tv-db.herokuapp.com/).
 4. Team Members:
 
       Abey Aseefa, Abhinav Jain, Amina Mahnoor Sohail, Megico Mejora, Temitope Olajide
 5. Please check project specification document for more details.
+6. A [new instance](https://github.com/abhinavjainn/world-tv-db-aws) of the application has been deployed on [AWS](http://python-wowtv.eba-ppa7mzyg.eu-west-2.elasticbeanstalk.com/) (01/2022).
 
 # Application Overview
 
@@ -19,7 +20,10 @@ The application “World TV Database” has following main features:
 
 # Application URL
 
-https://world-tv-db.herokuapp.com/
+[Application URL on Heroku](https://world-tv-db.herokuapp.com/)
+ 
+
+[Application URL on AWS](http://python-wowtv.eba-ppa7mzyg.eu-west-2.elasticbeanstalk.com/)
 
 # Application endpoints
 
